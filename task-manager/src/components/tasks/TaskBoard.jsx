@@ -67,7 +67,7 @@ const TaskBoard = ({ tasks }) => {
             </div>
           </Col>
         ))}
-        <Col className="board-column">
+        {/* <Col className="board-column">
           <div className="column-header d-flex justify-content-between align-items-center px-3 py-2">
             <div className="d-flex align-items-center">
               <h6 className="mb-0 text-uppercase fw-bold">ADD GROUP</h6>
@@ -78,7 +78,7 @@ const TaskBoard = ({ tasks }) => {
               <i className="bi bi-plus"></i>
             </Button>
           </div>
-        </Col>
+        </Col> */}
       </Row>
     </div>
   );
