@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Card, Alert, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -12,8 +11,7 @@ const Signup = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { register } = useAuth();
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,48 +20,47 @@ const Signup = () => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
-    try {
-      const { name, email, password, confirmPassword } = formData;
-      
-      // Validation
-      if (!name || !email || !password || !confirmPassword) {
-        setError('Please fill in all fields');
-        setLoading(false);
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        setError('Passwords do not match');
-        setLoading(false);
-        return;
-      }
-      
-      if (password.length < 6) {
-        setError('Password must be at least 6 characters');
-        setLoading(false);
-        return;
-      }
-      
-      // Register user
-      const userData = { name, email, password };
-      const success = register(userData);
-      
-      if (success) {
-        navigate('/tasks');
-      } else {
-        setError('Registration failed');
-      }
-    } catch (err) {
-      setError('Registration failed. Please try again.');
-      console.error(err);
-    } finally {
+
+    const { name, email, password, confirmPassword } = formData;
+
+    // Validation
+    if (!name || !email || !password || !confirmPassword) {
+      setError('Please fill in all fields');
       setLoading(false);
+      return;
     }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
+
+    // Save user in localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const userExists = users.find((u) => u.email === email);
+
+    if (userExists) {
+      setError('User already exists');
+      setLoading(false);
+      return;
+    }
+
+    users.push({ name, email, password });
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Redirect to login
+    navigate('/login');
   };
 
   return (
@@ -73,9 +70,9 @@ const Signup = () => {
           <Card className="shadow">
             <Card.Body>
               <Card.Title className="text-center mb-4">Sign Up</Card.Title>
-              
+
               {error && <Alert variant="danger">{error}</Alert>}
-              
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="name">
                   <Form.Label>Name</Form.Label>
@@ -121,23 +118,22 @@ const Signup = () => {
                   />
                 </Form.Group>
 
-             <Button
-  type="submit"
-  className="w-100 mt-3"
-  disabled={loading}
-  style={{
-    backgroundColor: "rgb(114, 8, 183)",
-    borderColor: "rgb(114, 8, 183)",
-    color: "#fff"
-  }}
->
-  {loading ? "Signing up..." : "Sign Up"}
-</Button>
-
+                <Button
+                  type="submit"
+                  className="w-100 mt-3"
+                  disabled={loading}
+                  style={{
+                    backgroundColor: 'rgb(114, 8, 183)',
+                    borderColor: 'rgb(114, 8, 183)',
+                    color: '#fff'
+                  }}
+                >
+                  {loading ? 'Signing up...' : 'Sign Up'}
+                </Button>
               </Form>
             </Card.Body>
           </Card>
-          
+
           <div className="text-center mt-3">
             Already have an account? <Link to="/login">Login</Link>
           </div>

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Form, Button, Card, Alert, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +9,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  const { login, clearError } = useAuth();
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -20,33 +18,34 @@ const Login = () => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
-    try {
-      const { email, password } = formData;
-      
-      if (!email || !password) {
-        setError('Please fill in all fields');
-        setLoading(false);
-        return;
-      }
-      
-      const success = await login(formData);
-      
-      if (success) {
-        navigate('/tasks');
-      } else {
-        setError('Invalid email or password');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-      console.error(err);
-    } finally {
+
+    const { email, password } = formData;
+
+    if (!email || !password) {
+      setError('Please fill in all fields');
       setLoading(false);
+      return;
     }
+
+    // Get users from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+      // Save session
+      localStorage.setItem('authUser', JSON.stringify(user));
+      localStorage.setItem('isAuthenticated', 'true');
+
+      navigate('/tasks');
+    } else {
+      setError('Invalid email or password');
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -56,9 +55,9 @@ const Login = () => {
           <Card className="shadow">
             <Card.Body>
               <Card.Title className="text-center mb-4">Login</Card.Title>
-              
+
               {error && <Alert variant="danger">{error}</Alert>}
-              
+
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
@@ -82,30 +81,28 @@ const Login = () => {
                   />
                 </Form.Group>
 
-               <Button
-  type="submit"
-  className="w-100 mt-3"
-  disabled={loading}
-  style={{
-    backgroundColor: "rgb(114, 8, 183)",
-    borderColor: "rgb(114, 8, 183)",
-    color: "#fff"
-  }}
->
-  {loading ? "Logging in..." : "Login"}
-</Button>
-
+                <Button
+                  type="submit"
+                  className="w-100 mt-3"
+                  disabled={loading}
+                  style={{
+                    backgroundColor: "rgb(114, 8, 183)",
+                    borderColor: "rgb(114, 8, 183)",
+                    color: "#fff"
+                  }}
+                >
+                  {loading ? "Logging in..." : "Login"}
+                </Button>
               </Form>
             </Card.Body>
           </Card>
-          
-          <div className="text-center mt-3">
-  Don't have an account?{" "}
-  <Link to="/signup" style={{ color: "rgb(114, 8, 183)", fontWeight: "500" }}>
-    Sign Up
-  </Link>
-</div>
 
+          <div className="text-center mt-3">
+            Don't have an account?{" "}
+            <Link to="/signup" style={{ color: "rgb(114, 8, 183)", fontWeight: "500" }}>
+              Sign Up
+            </Link>
+          </div>
         </Col>
       </Row>
     </Container>

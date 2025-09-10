@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
 import { TaskProvider } from './contexts/TaskContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/layout/Layout';
@@ -14,31 +13,41 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <TaskProvider>
-          <ThemeProvider>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                {/* Public routes */}
-                <Route index element={<Home />} />
-                <Route path="login" element={<Login />} />
-                <Route path="signup" element={<Signup />} />
-                
-                {/* Protected routes */}
-                <Route element={<PrivateRoute />}>
-                  <Route path="tasks" element={<TaskList />} />
-                  <Route path="tasks/:id" element={<TaskDetails />} />
-                </Route>
-                
-                {/* Fallback route */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Route>
-            </Routes>
-          </ThemeProvider>
-        </TaskProvider>
-      </AuthProvider>
+      <TaskProvider>
+        <ThemeProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              {/* Public routes */}
+              <Route index element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+
+              {/* Protected routes */}
+              <Route
+                path="tasks"
+                element={
+                  <PrivateRoute>
+                    <TaskList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="tasks/:id"
+                element={
+                  <PrivateRoute>
+                    <TaskDetails />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </ThemeProvider>
+      </TaskProvider>
     </Router>
   );
 }
 
-export default App
+export default App;

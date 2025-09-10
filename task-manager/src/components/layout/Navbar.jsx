@@ -6,16 +6,18 @@ import {
   Button,
   Dropdown,
 } from 'react-bootstrap';
-import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const authUser = JSON.parse(localStorage.getItem('authUser'));
+
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('isAuthenticated');
     navigate('/login');
   };
 
@@ -43,7 +45,7 @@ const Navbar = () => {
         <BootstrapNavbar.Toggle aria-controls="basic-navbar-nav" />
 
         <BootstrapNavbar.Collapse id="basic-navbar-nav">
-          {/* Left side links (Home + Tasks + Login/Signup if guest) */}
+          {/* Left side links */}
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/" className="me-3">
               Home
@@ -81,7 +83,7 @@ const Navbar = () => {
               <Dropdown align="end">
                 <Dropdown.Toggle variant="link" className="nav-user-dropdown p-0">
                   <div className="avatar">
-                    <span>AK</span>
+                    <span>{authUser?.name?.[0] || 'U'}</span>
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>

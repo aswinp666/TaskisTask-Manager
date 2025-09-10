@@ -1,12 +1,13 @@
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  // ✅ Use localStorage for auth check
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
   // Colors depending on theme
   const bgColor = isDark ? '#1c1c1e' : '#f8f9fa';
@@ -43,7 +44,6 @@ const Home = () => {
                 <Button
                   as={Link}
                   to="/tasks"
-                  variant="primary"
                   size="lg"
                   className="mt-3"
                   style={{
@@ -56,8 +56,6 @@ const Home = () => {
                     boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                     transition: 'all 0.3s ease',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   Go to My Tasks
                 </Button>
@@ -77,8 +75,6 @@ const Home = () => {
                       boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
                       transition: 'all 0.3s ease',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
                     Login
                   </Button>
@@ -96,16 +92,6 @@ const Home = () => {
                       boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
                       transition: 'all 0.3s ease',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.backgroundColor = '#7209B7';
-                      e.currentTarget.style.color = '#fff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.backgroundColor = isDark ? '#3a3a3c' : '#fff';
-                      e.currentTarget.style.color = isDark ? '#f5f5f5' : '#7209B7';
-                    }}
                   >
                     Sign Up
                   </Button>
@@ -114,6 +100,7 @@ const Home = () => {
             </Card.Body>
           </Card>
 
+          {/* Features Section */}
           <Row className="mt-5 g-4">
             {[
               { title: 'Organize', text: 'Create categories, set priorities, and organize tasks your way.', icon: 'bi-layout-text-window-reverse' },
