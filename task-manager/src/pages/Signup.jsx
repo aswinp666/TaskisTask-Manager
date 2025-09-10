@@ -121,14 +121,19 @@ const Signup = () => {
                   />
                 </Form.Group>
 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100 mt-3"
-                  disabled={loading}
-                >
-                  {loading ? 'Signing up...' : 'Sign Up'}
-                </Button>
+             <Button
+  type="submit"
+  className="w-100 mt-3"
+  disabled={loading}
+  style={{
+    backgroundColor: "rgb(114, 8, 183)",
+    borderColor: "rgb(114, 8, 183)",
+    color: "#fff"
+  }}
+>
+  {loading ? "Signing up..." : "Sign Up"}
+</Button>
+
               </Form>
             </Card.Body>
           </Card>

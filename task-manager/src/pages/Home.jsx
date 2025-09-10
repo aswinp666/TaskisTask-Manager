@@ -24,14 +24,25 @@ const Home = () => {
                   Go to My Tasks
                 </Button>
               ) : (
-                <div className="d-flex justify-content-center gap-3 mt-3">
-                  <Button as={Link} to="/login" variant="primary" size="lg">
-                    Login
-                  </Button>
-                  <Button as={Link} to="/signup" variant="outline-primary" size="lg">
-                    Sign Up
-                  </Button>
-                </div>
+              <div className="d-flex justify-content-center gap-3 mt-3">
+  <Button 
+    as={Link} 
+    to="/login" 
+    size="lg" 
+    style={{ backgroundColor: "rgb(114, 8, 183)", borderColor: "rgb(114, 8, 183)", color: "#fff" }}
+  >
+    Login
+  </Button>
+  <Button 
+    as={Link} 
+    to="/signup" 
+    size="lg" 
+    style={{ backgroundColor: "white", borderColor: "rgb(114, 8, 183)", color: "rgb(114, 8, 183)" }}
+  >
+    Sign Up
+  </Button>
+</div>
+
               )}
             </Card.Body>
           </Card>

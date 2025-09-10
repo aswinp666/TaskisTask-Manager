@@ -82,21 +82,30 @@ const Login = () => {
                   />
                 </Form.Group>
 
-                <Button
-                  variant="primary"
-                  type="submit"
-                  className="w-100 mt-3"
-                  disabled={loading}
-                >
-                  {loading ? 'Logging in...' : 'Login'}
-                </Button>
+               <Button
+  type="submit"
+  className="w-100 mt-3"
+  disabled={loading}
+  style={{
+    backgroundColor: "rgb(114, 8, 183)",
+    borderColor: "rgb(114, 8, 183)",
+    color: "#fff"
+  }}
+>
+  {loading ? "Logging in..." : "Login"}
+</Button>
+
               </Form>
             </Card.Body>
           </Card>
           
           <div className="text-center mt-3">
-            Don't have an account? <Link to="/signup">Sign Up</Link>
-          </div>
+  Don't have an account?{" "}
+  <Link to="/signup" style={{ color: "rgb(114, 8, 183)", fontWeight: "500" }}>
+    Sign Up
+  </Link>
+</div>
+
         </Col>
       </Row>
     </Container>
