@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge, Button, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Card, Badge, Button, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTask } from '../../contexts/TaskContext';
 
@@ -17,9 +17,9 @@ const TaskItem = ({ task, compact = false }) => {
 
   const getPriorityBadgeVariant = (priority) => {
     switch (priority) {
-      case 'high': return 'danger';
-      case 'medium': return 'warning';
-      case 'low': return 'info';
+      case 'high': return 'danger';   // red
+      case 'medium': return 'warning'; // yellow
+      case 'low': return 'success';   // green
       default: return 'secondary';
     }
   };
@@ -38,44 +38,43 @@ const TaskItem = ({ task, compact = false }) => {
   // Compact view (board)
   if (compact) {
     return (
-      <Card className="task-item mb-2">
-        <Card.Body className="p-2">
-          <div className="d-flex flex-column">
-            <div className="d-flex justify-content-between align-items-start mb-2">
-              <div className="d-flex align-items-center">
-                <Button 
-                  variant="" 
-                  className={`status-indicator me-2 status-${task.status}`} 
-                  onClick={handleStatusToggle}
-                >
-                  <i className={`bi ${task.status === 'todo' ? 'bi-circle' : task.status === 'in-progress' ? 'bi-hourglass-split' : 'bi-check-circle-fill'}`}></i>
-                </Button>
-                <span className={`task-title ${task.status === 'completed' ? 'text-decoration-line-through text-muted' : ''}`}>
-                  {task.title}
-                </span>
-              </div>
-
-              <Link to={`/tasks/${task.id}`} className="task-action-btn ms-1 text-muted">
-                <i className="bi bi-three-dots"></i>
-              </Link>
+      <Card className="task-item mb-2" style={{ height: '100%' }}>
+        <Card.Body className="p-2 d-flex flex-column" style={{ height: '100%' }}>
+          {/* Top row: Title and Priority */}
+          <div className="d-flex justify-content-between align-items-start mb-2">
+            <div className="d-flex align-items-center flex-grow-1">
+              <Button 
+                variant="" 
+                className={`status-indicator me-2 status-${task.status}`} 
+                onClick={handleStatusToggle}
+              >
+                <i className={`bi ${task.status === 'todo' ? 'bi-circle' : task.status === 'in-progress' ? 'bi-hourglass-split' : 'bi-check-circle-fill'}`}></i>
+              </Button>
+              <span className={`task-title ${task.status === 'completed' ? 'text-decoration-line-through text-muted' : ''}`}>
+                {task.title}
+              </span>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mt-auto">
-              {/* Assignee name instead of avatar */}
-              <div className="task-assignee me-2">
-                <small>{task.assignee || 'Unassigned'}</small>
-              </div>
+            {/* Priority badge pinned to right */}
+            {task.priority && (
+              <Badge 
+                bg={getPriorityBadgeVariant(task.priority)} 
+                className="text-uppercase"
+                style={{ flexShrink: 0 }}
+              >
+                {task.priority}
+              </Badge>
+            )}
+          </div>
 
-              {/* Priority as text */}
-              {task.priority && (
-                <Badge bg={getPriorityBadgeVariant(task.priority)} className="text-uppercase">
-                  {task.priority}
-                </Badge>
-              )}
+          {/* Bottom row: Assignee and Subtasks */}
+          <div className="d-flex justify-content-between align-items-center mt-auto">
+            <div className="task-assignee me-2">
+              <small>{task.assignee || 'Unassigned'}</small>
             </div>
 
             {task.subtasks && task.subtasks.length > 0 && (
-              <div className="task-subtasks mt-2">
+              <div className="task-subtasks">
                 <div className="d-flex align-items-center">
                   <i className="bi bi-check2-square me-1 small"></i>
                   <span className="small text-muted">
@@ -112,7 +111,7 @@ const TaskItem = ({ task, compact = false }) => {
               {task.status ? task.status.charAt(0).toUpperCase() + task.status.slice(1) : 'Todo'}
             </Badge>
 
-            {/* Priority as text */}
+            {/* Priority */}
             {task.priority && (
               <Badge bg={getPriorityBadgeVariant(task.priority)} className="text-uppercase">
                 {task.priority}
@@ -127,7 +126,7 @@ const TaskItem = ({ task, compact = false }) => {
 
         <div className="d-flex justify-content-between align-items-center mt-3">
           <div>
-            {/* Assignee name */}
+            {/* Assignee */}
             {task.assignee && <small className="me-2 text-muted">Assigned to: {task.assignee}</small>}
 
             {/* Category & Due date */}
