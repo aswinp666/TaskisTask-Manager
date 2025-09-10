@@ -80,7 +80,7 @@ const TaskList = () => {
         <Col>
           <div className="d-flex align-items-center">
             <div className="task-icon-bg me-3 d-flex align-items-center justify-content-center">
-              <i className="bi bi-check2-square fs-3"></i>
+              {/* <i className="bi bi-check2-square fs-3"></i> */}
             </div>
             <div>
               <h1 className="mb-0 fw-bold">My Tasks</h1>

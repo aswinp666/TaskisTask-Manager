@@ -20,9 +20,20 @@ const Home = () => {
               </Card.Text>
               
               {isAuthenticated ? (
-                <Button as={Link} to="/tasks" variant="primary" size="lg" className="mt-3">
-                  Go to My Tasks
-                </Button>
+                <Button
+  as={Link}
+  to="/tasks"
+  variant="primary"
+  size="lg"
+  className="mt-3"
+  style={{
+    backgroundColor: 'rgb(114, 9, 183)',
+    borderColor: 'rgb(114, 9, 183)',
+  }}
+>
+  Go to My Tasks
+</Button>
+
               ) : (
               <div className="d-flex justify-content-center gap-3 mt-3">
   <Button 
