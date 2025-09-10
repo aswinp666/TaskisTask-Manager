@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import TaskItem from './TaskItem';
 import { useTask } from '../../contexts/TaskContext';
@@ -7,15 +7,6 @@ import { useTheme } from '../../contexts/ThemeContext';
 const TaskBoard = ({ tasks }) => {
   const { addTask } = useTask();
   const { theme } = useTheme();
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile screen
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize(); // set initially
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Group tasks by status
   const groupedTasks = {
@@ -32,19 +23,18 @@ const TaskBoard = ({ tasks }) => {
   ];
 
   return (
-    <div
-      className="task-board-container"
-      style={isMobile ? { overflowX: 'auto', paddingBottom: '1rem' } : {}}
-    >
+    <div className="task-board-container">
+      {/* Scrollable on mobile, normal on desktop */}
       <Row
-        className="task-board g-0"
-        style={isMobile ? { display: 'flex', flexWrap: 'nowrap', gap: '1rem' } : {}}
+        className="task-board g-0 flex-nowrap overflow-auto"
+        style={{ flexWrap: 'nowrap' }}
       >
         {columns.map(column => (
           <Col
             key={column.key}
             className="board-column"
-            style={isMobile ? { minWidth: '250px', flex: '0 0 auto' } : {}}
+            xs={10} sm={8} md={4}   // narrow on mobile, equal 3 on desktop
+            style={{ minWidth: '280px' }}
           >
             <div className="column-header d-flex justify-content-between align-items-center px-3 py-2">
               <div className="d-flex align-items-center">
@@ -61,7 +51,6 @@ const TaskBoard = ({ tasks }) => {
                 </Button>
               )}
             </div>
-
             <div className="column-content p-2" style={{ minHeight: '70vh' }}>
               {groupedTasks[column.key].length > 0 ? (
                 <div className="d-flex flex-column gap-2">

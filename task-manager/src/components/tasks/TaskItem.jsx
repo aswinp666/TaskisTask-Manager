@@ -1,13 +1,16 @@
-import React from 'react';
-import { Card, Badge, Button, Form } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Card, Badge, Button, Form, Dropdown, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useTask } from '../../contexts/TaskContext';
-import { useTheme } from '../../contexts/ThemeContext'; // import theme
+import { useTheme } from '../../contexts/ThemeContext';
+import EditTaskForm from './EditTaskForm';
 
 const TaskItem = ({ task, compact = false }) => {
-  const { updateTask } = useTask();
-  const { theme } = useTheme(); // get current theme
+  const { updateTask, deleteTask } = useTask();
+  const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const getStatusBadgeVariant = (status) => {
     switch (status) {
@@ -20,9 +23,9 @@ const TaskItem = ({ task, compact = false }) => {
 
   const getPriorityBadgeVariant = (priority) => {
     switch (priority) {
-      case 'high': return 'danger';   // red
-      case 'medium': return 'warning'; // yellow
-      case 'low': return 'success';   // green
+      case 'high': return 'danger';
+      case 'medium': return 'warning';
+      case 'low': return 'success';
       default: return 'secondary';
     }
   };
@@ -64,105 +67,155 @@ const TaskItem = ({ task, compact = false }) => {
     marginRight: '0.5rem',
   };
 
-  // Compact view (board)
+  // --- COMPACT VIEW (Board) ---
   if (compact) {
     return (
-      <Card className="task-item mb-2" style={taskCardStyle}>
-        <Card.Body className="p-2 d-flex flex-column" style={{ flex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-            {/* Left: Status + Task Info */}
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', flexGrow: 1 }}>
-              <Button
-                variant=""
-                className={`status-indicator status-${task.status}`}
-                onClick={handleStatusToggle}
-                style={statusButtonStyle}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                <i className={`bi ${task.status === 'todo' ? 'bi-circle' : task.status === 'in-progress' ? 'bi-hourglass-split' : 'bi-check-circle-fill'}`}></i>
-              </Button>
+      <>
+        <Card className="task-item mb-2" style={taskCardStyle}>
+          <Card.Body className="p-2 d-flex flex-column" style={{ flex: 1 }}>
+            {/* Header row: status + title + priority + menu */}
+            <div className="d-flex justify-content-between align-items-start mb-2">
+              {/* Left side: status button + title */}
+              <div className="d-flex flex-grow-1">
+                <Button
+                  variant=""
+                  className={`status-indicator status-${task.status}`}
+                  onClick={handleStatusToggle}
+                  style={statusButtonStyle}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <i className={`bi ${task.status === 'todo' ? 'bi-circle' : task.status === 'in-progress' ? 'bi-hourglass-split' : 'bi-check-circle-fill'}`}></i>
+                </Button>
+                <div className="ms-2">
+                  <span style={titleStyle}>{task.title}</span>
+                </div>
+              </div>
 
-              {/* Vertical info */}
-              <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                <span style={titleStyle}>{task.title}</span>
-                {task.dueDate && <small style={{ color: isDark ? '#ccc' : '#6c757d', marginBottom: '0.25rem' }}>Due: {new Date(task.dueDate).toLocaleDateString()}</small>}
-                {task.assignee && <small style={{ color: isDark ? '#ccc' : '#6c757d' }}>Assigned to: {task.assignee}</small>}
+              {/* Right side: priority + menu */}
+              <div className="d-flex align-items-start gap-2">
+                {task.priority && (
+                  <Badge
+                    bg={getPriorityBadgeVariant(task.priority)}
+                    className="text-uppercase"
+                    style={{ flexShrink: 0 }}
+                  >
+                    {task.priority}
+                  </Badge>
+                )}
+                <Dropdown align="end">
+                  <Dropdown.Toggle as="button" className="btn btn-link p-0 border-0">
+                    <i className="bi bi-three-dots-vertical"></i>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setShowEditModal(true)}>Edit</Dropdown.Item>
+                    <Dropdown.Item onClick={() => deleteTask(task.id)} className="text-danger">
+                      Delete
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
 
-            {/* Right: Priority */}
-            {task.priority && (
-              <Badge
-                bg={getPriorityBadgeVariant(task.priority)}
-                className="text-uppercase"
-                style={{ flexShrink: 0, alignSelf: 'flex-start' }}
+            {/* Description */}
+            {task.description && (
+              <small
+                style={{
+                  color: isDark ? '#ccc' : '#6c757d',
+                  marginBottom: '0.25rem',
+                  display: 'block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
               >
-                {task.priority}
-              </Badge>
+                {task.description}
+              </small>
             )}
-          </div>
 
-          {/* Subtasks */}
-          {task.subtasks && task.subtasks.length > 0 && (
-            <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center' }}>
-              <i className="bi bi-check2-square me-1 small"></i>
-              <span style={{ fontSize: '0.75rem', color: isDark ? '#ccc' : '#6c757d' }}>
-                {task.subtasks.filter(st => st.completed).length}/{task.subtasks.length}
-              </span>
-            </div>
-          )}
-        </Card.Body>
-      </Card>
+            {/* Due Date */}
+            {task.dueDate && (
+              <small style={{ color: isDark ? '#ccc' : '#6c757d' }}>
+                <i className="bi bi-calendar-event me-1"></i>
+                {new Date(task.dueDate).toLocaleDateString()}
+              </small>
+            )}
+
+            {/* Subtasks pinned bottom */}
+            {task.subtasks && task.subtasks.length > 0 && (
+              <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center' }}>
+                <i className="bi bi-check2-square me-1 small"></i>
+                <span style={{ fontSize: '0.75rem', color: isDark ? '#ccc' : '#6c757d' }}>
+                  {task.subtasks.filter(st => st.completed).length}/{task.subtasks.length}
+                </span>
+              </div>
+            )}
+          </Card.Body>
+        </Card>
+
+        {/* Edit Modal */}
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+          <EditTaskForm task={task} onCancel={() => setShowEditModal(false)} />
+        </Modal>
+      </>
     );
   }
 
-  // Full list view
+  // --- FULL LIST VIEW ---
   return (
-    <Card className="task-item fade-in" style={taskCardStyle}>
-      <Card.Body>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Form.Check
-              type="checkbox"
-              checked={task.status === 'completed'}
-              onChange={handleStatusToggle}
-            />
-            <h5 style={{ marginLeft: '0.5rem', ...titleStyle }}>
-              {task.title}
-            </h5>
+    <>
+      <Card className="task-item fade-in" style={taskCardStyle}>
+        <Card.Body>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Form.Check
+                type="checkbox"
+                checked={task.status === 'completed'}
+                onChange={handleStatusToggle}
+              />
+              <h5 style={{ marginLeft: '0.5rem', ...titleStyle }}>
+                {task.title}
+              </h5>
+            </div>
+
+            {/* 3-dot menu */}
+            <Dropdown align="end">
+              <Dropdown.Toggle as="button" className="btn btn-link p-0 border-0">
+                <i className="bi bi-three-dots-vertical"></i>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => setShowEditModal(true)}>Edit</Dropdown.Item>
+                <Dropdown.Item onClick={() => deleteTask(task.id)} className="text-danger">
+                  Delete
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Badge bg={getStatusBadgeVariant(task.status)} className="text-uppercase">
-              {task.status ? task.status.charAt(0).toUpperCase() + task.status.slice(1) : 'Todo'}
-            </Badge>
-            {task.priority && (
-              <Badge bg={getPriorityBadgeVariant(task.priority)} className="text-uppercase">
-                {task.priority}
-              </Badge>
-            )}
-          </div>
-        </div>
+          {task.description && (
+            <Card.Text style={{ marginTop: '0.5rem', marginBottom: '0.5rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', color: isDark ? '#fff' : '#000' }}>
+              {task.description}
+            </Card.Text>
+          )}
 
-        {task.description && (
-          <Card.Text style={{ marginTop: '0.5rem', marginBottom: '0.5rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', color: isDark ? '#fff' : '#000' }}>
-            {task.description}
-          </Card.Text>
-        )}
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem' }}>
-          <div>
-            {task.assignee && <small style={{ marginRight: '0.5rem', color: isDark ? '#ccc' : '#6c757d' }}>Assigned to: {task.assignee}</small>}
-            {task.category && <Badge bg="info" style={{ marginRight: '0.5rem' }}>{task.category}</Badge>}
-            {task.dueDate && <small style={{ color: isDark ? '#ccc' : '#6c757d' }}>Due: {new Date(task.dueDate).toLocaleDateString()}</small>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem' }}>
+            <div>
+              {task.assignee && <small style={{ marginRight: '0.5rem', color: isDark ? '#ccc' : '#6c757d' }}>Assigned to: {task.assignee}</small>}
+              {task.category && <Badge bg="info" style={{ marginRight: '0.5rem' }}>{task.category}</Badge>}
+              {task.dueDate && <small style={{ color: isDark ? '#ccc' : '#6c757d' }}>Due: {new Date(task.dueDate).toLocaleDateString()}</small>}
+            </div>
+            <Button as={Link} to={`/tasks/${task.id}`} variant="outline-primary" size="sm">
+              View Details
+            </Button>
           </div>
-          <Button as={Link} to={`/tasks/${task.id}`} variant="outline-primary" size="sm">
-            View Details
-          </Button>
-        </div>
-      </Card.Body>
-    </Card>
+        </Card.Body>
+      </Card>
+
+      {/* Edit Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+        <EditTaskForm task={task} onCancel={() => setShowEditModal(false)} />
+      </Modal>
+    </>
   );
 };
 

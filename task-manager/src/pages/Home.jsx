@@ -1,12 +1,22 @@
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Home = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  // Colors depending on theme
+  const bgColor = isDark ? '#1c1c1e' : '#f8f9fa';
+  const cardBg = isDark ? '#2c2c2e' : '#fff';
+  const textColor = isDark ? '#f5f5f5' : '#333';
+  const secondaryTextColor = isDark ? '#ccc' : '#555';
+  const buttonGradient = 'linear-gradient(90deg, #7209B7, #B5179E)';
 
   return (
-    <Container fluid className="py-5" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <Container fluid className="py-5" style={{ backgroundColor: bgColor, minHeight: '100vh' }}>
       <Row className="justify-content-center text-center">
         <Col xs={12} md={8} lg={6}>
           <h1
@@ -15,20 +25,20 @@ const Home = () => {
           >
             Taskis Manager
           </h1>
-          
+
           <Card
             className="shadow-lg mb-4"
-            style={{ borderRadius: '1rem', overflow: 'hidden' }}
+            style={{ borderRadius: '1rem', overflow: 'hidden', backgroundColor: cardBg }}
           >
             <Card.Body>
-              <Card.Title className="fw-bold mb-3" style={{ fontSize: '1.5rem', color: '#333' }}>
+              <Card.Title className="fw-bold mb-3" style={{ fontSize: '1.5rem', color: textColor }}>
                 Organize your tasks efficiently
               </Card.Title>
-              <Card.Text style={{ fontSize: '1rem', color: '#555' }}>
+              <Card.Text style={{ fontSize: '1rem', color: secondaryTextColor }}>
                 Taskis Manager helps you organize your work, track progress, and boost productivity.
                 Create tasks, set priorities, add due dates, and never miss a deadline again.
               </Card.Text>
-              
+
               {isAuthenticated ? (
                 <Button
                   as={Link}
@@ -37,7 +47,7 @@ const Home = () => {
                   size="lg"
                   className="mt-3"
                   style={{
-                    background: 'linear-gradient(90deg, #7209B7, #B5179E)',
+                    background: buttonGradient,
                     border: 'none',
                     color: '#fff',
                     padding: '0.75rem 2rem',
@@ -53,12 +63,12 @@ const Home = () => {
                 </Button>
               ) : (
                 <div className="d-flex justify-content-center flex-wrap gap-3 mt-3">
-                  <Button 
-                    as={Link} 
-                    to="/login" 
-                    size="lg" 
+                  <Button
+                    as={Link}
+                    to="/login"
+                    size="lg"
                     style={{
-                      background: 'linear-gradient(90deg, #7209B7, #B5179E)',
+                      background: buttonGradient,
                       border: 'none',
                       color: '#fff',
                       padding: '0.75rem 2rem',
@@ -72,14 +82,14 @@ const Home = () => {
                   >
                     Login
                   </Button>
-                  <Button 
-                    as={Link} 
-                    to="/signup" 
-                    size="lg" 
+                  <Button
+                    as={Link}
+                    to="/signup"
+                    size="lg"
                     style={{
-                      background: '#fff',
-                      border: '2px solid #7209B7',
-                      color: '#7209B7',
+                      background: isDark ? '#3a3a3c' : '#fff',
+                      border: `2px solid #7209B7`,
+                      color: isDark ? '#f5f5f5' : '#7209B7',
                       padding: '0.75rem 2rem',
                       fontWeight: '600',
                       borderRadius: '0.75rem',
@@ -88,13 +98,13 @@ const Home = () => {
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'scale(1.05)';
-                      e.currentTarget.style.backgroundColor = 'rgb(114, 9, 183)';
+                      e.currentTarget.style.backgroundColor = '#7209B7';
                       e.currentTarget.style.color = '#fff';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'scale(1)';
-                      e.currentTarget.style.backgroundColor = '#fff';
-                      e.currentTarget.style.color = 'rgb(114, 9, 183)';
+                      e.currentTarget.style.backgroundColor = isDark ? '#3a3a3c' : '#fff';
+                      e.currentTarget.style.color = isDark ? '#f5f5f5' : '#7209B7';
                     }}
                   >
                     Sign Up
@@ -103,7 +113,7 @@ const Home = () => {
               )}
             </Card.Body>
           </Card>
-          
+
           <Row className="mt-5 g-4">
             {[
               { title: 'Organize', text: 'Create categories, set priorities, and organize tasks your way.', icon: 'bi-layout-text-window-reverse' },
@@ -111,20 +121,20 @@ const Home = () => {
               { title: 'Complete', text: 'Get things done on time with reminders and due dates.', icon: 'bi-check2-square' },
             ].map((feature, idx) => (
               <Col key={idx} xs={12} md={6} lg={4}>
-                <Card 
+                <Card
                   className="h-100 shadow-sm text-center"
                   style={{
                     borderRadius: '1rem',
                     padding: '1.5rem',
                     transition: 'all 0.3s ease',
-                    backgroundColor: '#fff',
+                    backgroundColor: cardBg,
                   }}
                   onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'}
                   onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
                 >
                   <i className={`bi ${feature.icon} mb-3`} style={{ fontSize: '2rem', color: 'rgb(114, 9, 183)' }}></i>
-                  <Card.Title className="fw-bold mb-2">{feature.title}</Card.Title>
-                  <Card.Text style={{ color: '#555' }}>{feature.text}</Card.Text>
+                  <Card.Title className="fw-bold mb-2" style={{ color: textColor }}>{feature.title}</Card.Title>
+                  <Card.Text style={{ color: secondaryTextColor }}>{feature.text}</Card.Text>
                 </Card>
               </Col>
             ))}
