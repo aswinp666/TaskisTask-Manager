@@ -70,9 +70,11 @@ const TaskItem = ({ task, compact = false }) => {
                   placement="top"
                   overlay={<Tooltip>View details</Tooltip>}
                 >
-                  <Link to={`/tasks/${task.id}`} className="task-action-btn ms-1">
-                    <i className="bi bi-three-dots"></i>
-                  </Link>
+                <Link to={`/tasks/${task.id}`} className="task-action-btn ms-1 text-muted">
+  <i className="bi bi-three-dots"></i>
+</Link>
+
+
                 </OverlayTrigger>
               </div>
             </div>
@@ -107,9 +109,10 @@ const TaskItem = ({ task, compact = false }) => {
                   placement="top"
                   overlay={<Tooltip>Due date: {new Date(task.dueDate).toLocaleDateString()}</Tooltip>}
                 >
-                  <span className="task-due-date">
-                    {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
-                  </span>
+                 <span className="task-due-date text-muted">
+  {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+</span>
+
                 </OverlayTrigger>
               )}
             </div>
