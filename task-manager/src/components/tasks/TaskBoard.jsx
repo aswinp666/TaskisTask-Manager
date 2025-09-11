@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import TaskItem from './TaskItem';
 import { useTask } from '../../contexts/TaskContext';
@@ -7,6 +7,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 const TaskBoard = ({ tasks }) => {
   const { addTask } = useTask();
   const { theme } = useTheme();
+  const [activeColumn, setActiveColumn] = useState('todo'); // mobile toggle state
 
   // Group tasks by status
   const groupedTasks = {
@@ -24,17 +25,32 @@ const TaskBoard = ({ tasks }) => {
 
   return (
     <div className="task-board-container">
-      {/* Scrollable on mobile, normal on desktop */}
+      {/* Mobile toggle buttons */}
+      <div className="d-md-none mb-3 text-center">
+        {columns.map(column => (
+          <Button
+            key={column.key}
+            variant={activeColumn === column.key ? column.variant : 'outline-secondary'}
+            className="mx-1"
+            size="sm"
+            onClick={() => setActiveColumn(column.key)}
+          >
+            <i className={`bi ${column.icon} me-1`}></i>
+            {column.title}
+          </Button>
+        ))}
+      </div>
+
+      {/* Desktop view = 3 columns | Mobile view = only active column */}
       <Row
-        className="task-board g-0 flex-nowrap overflow-auto"
-        style={{ flexWrap: 'nowrap' }}
+        className="task-board g-0"
+        style={{ flexWrap: 'nowrap', overflowX: 'auto' }}
       >
         {columns.map(column => (
           <Col
             key={column.key}
-            className="board-column"
-            xs={10} sm={8} md={4}   // narrow on mobile, equal 3 on desktop
-            style={{ minWidth: '280px' }}
+            className={`board-column ${activeColumn === column.key ? '' : 'd-none d-md-block'}`}
+            xs={12} md={4}
           >
             <div className="column-header d-flex justify-content-between align-items-center px-3 py-2">
               <div className="d-flex align-items-center">
