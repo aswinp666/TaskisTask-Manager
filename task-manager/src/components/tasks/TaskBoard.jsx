@@ -25,21 +25,22 @@ const TaskBoard = ({ tasks }) => {
 
   return (
     <div className="task-board-container">
-      {/* Mobile toggle buttons */}
-      <div className="d-md-none mb-3 text-center">
-        {columns.map(column => (
-          <Button
-            key={column.key}
-            variant={activeColumn === column.key ? column.variant : 'outline-secondary'}
-            className="mx-1"
-            size="sm"
-            onClick={() => setActiveColumn(column.key)}
-          >
-            <i className={`bi ${column.icon} me-1`}></i>
-            {column.title}
-          </Button>
-        ))}
-      </div>
+    {/* Mobile toggle buttons */}
+<div className="d-md-none mb-3 text-center">
+  {columns.map(column => (
+    <Button
+      key={column.key}
+      variant={activeColumn === column.key ? column.variant : 'outline-secondary'}
+      className="me-2 mb-2"  // 👉 adds right margin & bottom margin
+      size="sm"
+      onClick={() => setActiveColumn(column.key)}
+    >
+      <i className={`bi ${column.icon} me-1`}></i>
+      {column.title}
+    </Button>
+  ))}
+</div>
+
 
       {/* Desktop view = 3 columns | Mobile view = only active column */}
       <Row
